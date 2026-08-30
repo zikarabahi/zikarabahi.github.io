@@ -1,0 +1,44 @@
+name: auto-publish
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 11:00 بتوقيت القدس (UTC+3)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate next article + rebuild site
+        run: python3 engine/main.py --auto
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+      - name: Sync build output to repo root (Pages serves root)
+        run: |
+          for f in index.html about.html contact.html privacy.html 404.html sitemap.xml robots.txt style.css favicon.svg og-image.png; do
+            [ -f "$f" ] && rm "$f"
+          done
+          rm -rf articles
+          cp -r public/. .
+
+      - name: Commit and push
+        run: |
+          git config user.name "Zika Rabahi"
+          git config user.email "info@zika-rabahi.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "auto: daily article"
+            git push
+          else
+            echo "لا تغييرات جديدة."
+          fi
