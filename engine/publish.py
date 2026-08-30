@@ -86,6 +86,7 @@ def build_site(root, cfg):
     items.sort(key=lambda a: a["date"], reverse=True)
 
     base = cfg.get("base_url", "").rstrip("/")
+    ads_client = cfg.get("adsense_client", "")
     site_name = html.escape(cfg["site_name"])
     tagline = html.escape(cfg.get("tagline", ""))
     year = str(datetime.date.today().year)
@@ -133,6 +134,7 @@ def build_site(root, cfg):
             .replace("__RELATED__", related)
             .replace("__CONTENT__", content)
             .replace("__REL__", "../")
+            .replace("__ADSENSE_CLIENT__", ads_client)
         )
         with open(os.path.join(articles_dir, a["slug"] + ".html"), "w", encoding="utf-8") as f:
             f.write(page)
@@ -146,6 +148,7 @@ def build_site(root, cfg):
         .replace("__ARTICLE_COUNT__", str(count))
         .replace("__CARDS__", "\n".join(card(a) for a in items))
         .replace("__REL__", "")
+        .replace("__ADSENSE_CLIENT__", ads_client)
     )
     with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as f:
         f.write(index)
@@ -165,6 +168,7 @@ def build_site(root, cfg):
                 .replace("__ARTICLE_COUNT__", str(count))
                 .replace("__DATE__", datetime.date.today().isoformat())
                 .replace("__REL__", "")
+                .replace("__ADSENSE_CLIENT__", ads_client)
             )
             with open(os.path.join(out, fn), "w", encoding="utf-8") as f:
                 f.write(page)

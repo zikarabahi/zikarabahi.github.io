@@ -11,5 +11,6 @@
     "model": "openai/gpt-oss-120b",
     "api_key_env": "GROQ_API_KEY"
   },
-  "adsense_slot": ""
+  "adsense_slot": "",
+  "adsense_client": "ca-pub-1659279862622279"
 }
