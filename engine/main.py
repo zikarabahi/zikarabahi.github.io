@@ -126,6 +126,10 @@ def main():
 
         print(f"\n🎉 اكتمل: {made} مقالًا جديدًا.")
 
+        if args.auto and made == 0:
+            print("\n❌ لم يُنشر أي مقال هذه الدورة (فشلت محاولات الكتابة) — ستُعاد في الدورة القادمة.")
+            sys.exit(1)
+
     count = publish.build_site(ROOT, cfg)
     print(f"🌐 أُعيد بناء الموقع ({count} مقالًا) في public/")
 
