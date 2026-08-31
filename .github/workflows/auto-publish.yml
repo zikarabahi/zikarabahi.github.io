@@ -3,6 +3,7 @@ name: auto-publish
 on:
   schedule:
     - cron: "0 8 * * *" # 11:00 بتوقيت القدس (UTC+3)
+    - cron: "0 20 * * *" # 23:00 بتوقيت القدس — شبكة أمان: إن فشل الظهيرة ينجح الليل
   workflow_dispatch:
 
 permissions:

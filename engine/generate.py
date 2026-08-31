@@ -54,10 +54,14 @@ def llm_generate(topic, cfg, today):
     base = cfg["llm"].get("api_base", "https://api.openai.com/v1").rstrip("/")
     _size = len(_json.dumps(payload, ensure_ascii=True).encode("utf-8"))
     resp = None
-    for attempt in range(3):
+    for attempt in range(6):
         resp = requests.post(
             base + "/chat/completions",
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            headers={
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+                "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+            },
             json=payload,
             timeout=180,
         )
@@ -65,8 +69,8 @@ def llm_generate(topic, cfg, today):
         # 401/404 خطأ حقيقي (مفتاح/نموذج) — لا معنى لإعادة المحاولة
         if resp.status_code in (200, 401, 404):
             break
-        if attempt < 2:
-            time.sleep(5)  # أخطاء مؤقتة (413/429/5xx) — نعيد بعد قليل
+        if attempt < 5:
+            time.sleep(15 * (attempt + 1))  # أخطاء مؤقتة (413/429/5xx) — نعيد بتدرّج حتى ~3 دقائق
     resp.raise_for_status()
     text = resp.json()["choices"][0]["message"]["content"].strip()
     text = re.sub(r"^```(?:markdown)?\s*|\s*```$", "", text, flags=re.M).strip()
