@@ -25,6 +25,7 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
       - name: Sync build output to repo root (Pages serves root)
+        if: always()
         run: |
           for f in index.html about.html contact.html privacy.html 404.html sitemap.xml robots.txt style.css favicon.svg og-image.png; do
             [ -f "$f" ] && rm "$f"
@@ -32,13 +33,14 @@ jobs:
           rm -rf articles
           cp -r public/. .
 
-      - name: Commit and push
+      - name: Commit and push (article or run status — the black box)
+        if: always()
         run: |
           git config user.name "Zika Rabahi"
           git config user.email "info@zika-rabahi.com"
           git add -A
           if ! git diff --cached --quiet; then
-            git commit -m "auto: daily article"
+            git commit -m "auto: daily run $(date -u +%F)"
             git push
           else
             echo "لا تغييرات جديدة."

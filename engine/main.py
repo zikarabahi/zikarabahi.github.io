@@ -41,6 +41,20 @@ def load_cfg():
         return json.load(f)
 
 
+def _write_run_status(status, made):
+    """صندوق أسود: يسجّل نتيجة كل دورة في data/last-run.json (يُراقب من خارج GitHub)."""
+    path = os.path.join(ROOT, "data", "last-run.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    payload = {
+        "date": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "status": status,
+        "articles": made,
+    }
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    print(f"  📋 سجل الدورة: data/last-run.json ({status}, {made} مقالًا)")
+
+
 def load_topics():
     path = os.path.join(ROOT, "topics.txt")
     if not os.path.exists(path):
@@ -93,6 +107,7 @@ def main():
 
     if not pending:
         print("✅ لا توجد مواضيع جديدة. أضف المزيد إلى topics.txt")
+        _write_run_status("no_topics", 0)
     else:
         limit = args.limit or cfg.get("articles_per_run", 1)
         pending = pending[:limit]
@@ -127,8 +142,10 @@ def main():
         print(f"\n🎉 اكتمل: {made} مقالًا جديدًا.")
 
         if args.auto and made == 0:
+            _write_run_status("api_failed", 0)
             print("\n❌ لم يُنشر أي مقال هذه الدورة (فشلت محاولات الكتابة) — ستُعاد في الدورة القادمة.")
             sys.exit(1)
+        _write_run_status("ok", made)
 
     count = publish.build_site(ROOT, cfg)
     print(f"🌐 أُعيد بناء الموقع ({count} مقالًا) في public/")
