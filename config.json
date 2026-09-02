@@ -9,7 +9,8 @@
   "llm": {
     "api_base": "https://api.groq.com/openai/v1",
     "model": "openai/gpt-oss-120b",
-    "api_key_env": "GROQ_API_KEY"
+    "api_key_env": "GROQ_API_KEY",
+    "max_tokens": 6000
   },
   "adsense_slot": "",
   "adsense_client": "ca-pub-1659279862622279"

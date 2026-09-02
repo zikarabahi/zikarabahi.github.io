@@ -41,7 +41,7 @@ def llm_generate(topic, cfg, today):
     payload = {
         "model": cfg["llm"].get("model", "gpt-4o-mini"),
         "temperature": 0.7,
-        "max_tokens": 8000,
+        "max_tokens": cfg["llm"].get("max_tokens", 6000),
         "messages": [
             {
                 "role": "user",
